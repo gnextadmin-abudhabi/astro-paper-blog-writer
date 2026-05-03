@@ -1,0 +1,10 @@
+[
+  {
+    "id": "example-001",
+    "title": "Example: Delete This Entry Before Going Live",
+    "scheduledFor": "2099-01-01T00:00:00Z",
+    "tags": ["example"],
+    "hint": "Optional: add any notes here to guide the writing style or focus",
+    "status": "pending"
+  }
+]

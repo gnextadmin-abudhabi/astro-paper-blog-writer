@@ -1,0 +1,46 @@
+name: Auto Publish Scheduled Posts
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"   # runs every 30 minutes
+  workflow_dispatch:           # allows manual trigger from GitHub UI
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate due posts
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: node scripts/generate-posts.js
+
+      - name: Commit and push if posts were generated
+        run: |
+          git config user.name "Auto Publisher"
+          git config user.email "autopublish@noreply.com"
+          git add src/data/blog/ scheduled-posts.json
+          if git diff --cached --quiet; then
+            echo "Nothing new to commit."
+          else
+            git commit -m "auto: publish scheduled posts [skip ci]"
+            git push
+          fi
