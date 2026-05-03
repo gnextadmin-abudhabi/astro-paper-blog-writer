@@ -8,9 +8,28 @@ const ROOT = path.resolve(__dirname, "..");
 const QUEUE_FILE = path.join(ROOT, "scheduled-posts.json");
 const BLOG_DIR = path.join(ROOT, "src/data/blog");
 
-const apiKey = process.env.ANTHROPIC_API_KEY;
-console.log(`API key prefix: ${apiKey ? apiKey.trim().substring(0, 15) : "NOT SET"}`);
-const client = new Anthropic({ apiKey: apiKey?.trim() });
+const apiKey = process.env.ANTHROPIC_API_KEY?.trim();
+console.log(`API key prefix: ${apiKey ? apiKey.substring(0, 15) : "NOT SET"}`);
+console.log(`API key length in Node: ${apiKey?.length ?? 0}`);
+
+// Quick connectivity test before running posts
+const testRes = await fetch("https://api.anthropic.com/v1/messages", {
+  method: "POST",
+  headers: {
+    "x-api-key": apiKey ?? "",
+    "anthropic-version": "2023-06-01",
+    "content-type": "application/json",
+  },
+  body: JSON.stringify({ model: "claude-haiku-4-5-20251001", max_tokens: 5, messages: [{ role: "user", content: "hi" }] }),
+});
+console.log(`Direct API test status: ${testRes.status}`);
+if (!testRes.ok) {
+  const errBody = await testRes.text();
+  console.error("API error body:", errBody);
+  process.exit(1);
+}
+
+const client = new Anthropic({ apiKey });
 
 function slugify(title) {
   return title
