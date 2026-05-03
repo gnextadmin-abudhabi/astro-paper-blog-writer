@@ -8,7 +8,9 @@ const ROOT = path.resolve(__dirname, "..");
 const QUEUE_FILE = path.join(ROOT, "scheduled-posts.json");
 const BLOG_DIR = path.join(ROOT, "src/data/blog");
 
-const client = new Anthropic();
+const apiKey = process.env.ANTHROPIC_API_KEY;
+console.log(`API key prefix: ${apiKey ? apiKey.trim().substring(0, 15) : "NOT SET"}`);
+const client = new Anthropic({ apiKey: apiKey?.trim() });
 
 function slugify(title) {
   return title
