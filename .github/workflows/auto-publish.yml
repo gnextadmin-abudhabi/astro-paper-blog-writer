@@ -42,5 +42,6 @@ jobs:
             echo "Nothing new to commit."
           else
             git commit -m "auto: publish scheduled posts [skip ci]"
+            git pull --rebase
             git push
           fi
