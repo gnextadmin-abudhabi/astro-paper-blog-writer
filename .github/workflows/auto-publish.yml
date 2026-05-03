@@ -31,7 +31,10 @@ jobs:
       - name: Generate due posts
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-        run: node scripts/generate-posts.js
+        run: |
+          echo "API key set: $([[ -n "$ANTHROPIC_API_KEY" ]] && echo YES || echo NO)"
+          echo "API key length: ${#ANTHROPIC_API_KEY}"
+          node scripts/generate-posts.js
 
       - name: Commit and push if posts were generated
         run: |
